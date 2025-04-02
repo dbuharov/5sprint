@@ -1,6 +1,9 @@
 package spentenergy
 
-import ...
+import (
+	"fmt"
+	"time"
+)
 
 // Основные константы, необходимые для расчетов.
 const (
@@ -28,8 +31,24 @@ const (
 // duration time.Duration — длительность тренировки.
 //
 // Создайте функцию ниже.
-...
-
+func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) float64 {
+	if weight <= 0 {
+		fmt.Println("The weight must be greater than 0")
+		return 0
+	}
+	if height <= 0 {
+		fmt.Println("The height must be greater than 0")
+		return 0
+	}
+	if duration <= 0 {
+		fmt.Println("The duration must be greater than 0")
+		return 0
+	}
+	aveSpeedW := MeanSpeed(steps, duration)
+	durationHW := duration.Hours()
+	caloriesW := ((walkingCaloriesWeightMultiplier * weight) + (aveSpeedW*aveSpeedW/height)*walkingSpeedHeightMultiplier) * durationHW * minInH
+	return caloriesW
+}
 
 // Константы для расчета калорий, расходуемых при беге.
 const (
@@ -46,8 +65,19 @@ const (
 // duration time.Duration — длительность тренировки.
 //
 // Создайте функцию ниже.
-...
-
+func RunningSpentCalories(steps int, weight float64, duration time.Duration) float64 {
+	if weight <= 0 {
+		fmt.Println("The weight must be greater than 0")
+		return 0
+	}
+	if duration <= 0 {
+		fmt.Println("The duration must be greater than 0")
+		return 0
+	}
+	aveSpeedR := MeanSpeed(steps, duration)
+	caloriesR := ((runningCaloriesMeanSpeedMultiplier * aveSpeedR) - runningCaloriesMeanSpeedShift) * weight
+	return caloriesR
+}
 
 // МeanSpeed возвращает значение средней скорости движения во время тренировки.
 //
@@ -55,10 +85,15 @@ const (
 //
 // steps int — количество совершенных действий(число шагов при ходьбе и беге).
 // duration time.Duration — длительность тренировки.
-// 
+//
 // Создайте функцию ниже.
-...
-
+func MeanSpeed(steps int, duration time.Duration) float64 {
+	if duration < 0 {
+		return 0
+	}
+	dist := Distance(steps)
+	return dist / duration.Hours()
+}
 
 // Distance возвращает дистанцию(в километрах), которую преодолел пользователь за время тренировки.
 //
@@ -66,8 +101,8 @@ const (
 // Параметры:
 //
 // steps int — количество совершенных действий (число шагов при ходьбе и беге).
-// 
+//
 // Создайте функцию ниже
-...
-
-
+func Distance(steps int) float64 {
+	return (float64(steps) * lenStep) / mInKm
+}
